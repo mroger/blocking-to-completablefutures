@@ -26,26 +26,42 @@ public class DisciplineServiceImpl implements DisciplineService {
 
     public List<Discipline> retornaDisciplinasDependencia() {
 
-        StudentCourse studentCourse = studentCourseService.getByCodInstAndStudentArAndCourse();
-        Matrix matrix = matrixService.getMatrixById(studentCourse.getMatrixId());
+        Matrix matrix = getMatrix();
 
-        Integer nextStudentTerm = studentTermService.nextTerm(matrix.getCod());
-        List<MMatrix> matrixDisciplines = mmatrixService.getAllMatrixDisciplines(matrix.getId(), nextStudentTerm);
-        List<MMatrix> previousTermsDisciplines = matrixDisciplines.stream()
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+        List<MMatrix> previousTermsDisciplines = getmMatrices(matrix);
 
-        StudentGroup studentGroup = studentGroupService.getByCodInstAndStudentAr();
-        List<Registration> registrationsList = registrationService.studentRegisteredDisciplines(studentGroup.getCode());
+        List<Registration> registrationsList = getRegistrations();
 
         List<MMatrix> disciplinesDependencyList = filterNonRegisteredDisciplines(previousTermsDisciplines, registrationsList);
 
         List<Registration> pendingRegistrationsList = filterFailedDisciplines(registrationsList, disciplinesDependencyList);
 
-        List<Discipline> disciplinesList = createDependencyDisciplinesList(pendingRegistrationsList, matrix);
-        List<Discipline> requiredDisciplinesList = getRequiredDisciplines(disciplinesList);
+        List<Discipline> requiredDisciplinesList = getRequiredDisciplines(matrix, pendingRegistrationsList);
 
         return getDisciplinesWithoutAchievement(requiredDisciplinesList);
+    }
+
+    private List<Discipline> getRequiredDisciplines(Matrix matrix, List<Registration> pendingRegistrationsList) {
+        List<Discipline> disciplinesList = createDependencyDisciplinesList(pendingRegistrationsList, matrix);
+        return getRequiredDisciplines(disciplinesList);
+    }
+
+    private List<Registration> getRegistrations() {
+        StudentGroup studentGroup = studentGroupService.getByCodInstAndStudentAr();
+        return registrationService.studentRegisteredDisciplines(studentGroup.getCode());
+    }
+
+    private List<MMatrix> getmMatrices(Matrix matrix) {
+        Integer nextStudentTerm = studentTermService.nextTerm(matrix.getCod());
+        List<MMatrix> matrixDisciplines = mmatrixService.getAllMatrixDisciplines(matrix.getId(), nextStudentTerm);
+        return matrixDisciplines.stream()
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+    }
+
+    private Matrix getMatrix() {
+        StudentCourse studentCourse = studentCourseService.getByCodInstAndStudentArAndCourse();
+        return matrixService.getMatrixById(studentCourse.getMatrixId());
     }
 
     private List<Discipline> getDisciplinesWithoutAchievement(List<Discipline> requiredDisciplinesList) {
