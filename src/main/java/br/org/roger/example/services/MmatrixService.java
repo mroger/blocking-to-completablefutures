@@ -6,6 +6,6 @@ import java.util.List;
 
 public interface MmatrixService {
 
-    List<MMatrix> getAllMatrixDisciplines(Object id);
+    List<MMatrix> getAllMatrixDisciplines(Object id, Integer nextStudentTerm);
 
 }

@@ -27,32 +27,25 @@ public class DisciplineServiceImpl implements DisciplineService {
     public List<Discipline> retornaDisciplinasDependencia() {
 
         StudentCourse studentCourse = studentCourseService.getByCodInstAndStudentArAndCourse();
-
-        StudentGroup studentGroup = studentGroupService.getByCodInstAndStudentAr();
-
         Matrix matrix = matrixService.getMatrixById(studentCourse.getMatrixId());
 
-        List<MMatrix> matrixDisciplines = mmatrixService.getAllMatrixDisciplines(matrix.getId());
-
         Integer nextStudentTerm = studentTermService.nextTerm(matrix.getCod());
-
+        List<MMatrix> matrixDisciplines = mmatrixService.getAllMatrixDisciplines(matrix.getId(), nextStudentTerm);
         List<MMatrix> previousTermsDisciplines = matrixDisciplines.stream()
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
+        StudentGroup studentGroup = studentGroupService.getByCodInstAndStudentAr();
         List<Registration> registrationsList = registrationService.studentRegisteredDisciplines(studentGroup.getCode());
 
         List<MMatrix> disciplinesDependencyList = filterNonRegisteredDisciplines(previousTermsDisciplines, registrationsList);
 
-        List<Registration> pendingRegistrationsList = filterFailedDisciplines(registrationsList);
+        List<Registration> pendingRegistrationsList = filterFailedDisciplines(registrationsList, disciplinesDependencyList);
 
         List<Discipline> disciplinesList = createDependencyDisciplinesList(pendingRegistrationsList, matrix);
-
         List<Discipline> requiredDisciplinesList = getRequiredDisciplines(disciplinesList);
 
-        List<Discipline> disciplinesWithoutAchievement = getDisciplinesWithoutAchievement(requiredDisciplinesList);
-
-        return null;
+        return getDisciplinesWithoutAchievement(requiredDisciplinesList);
     }
 
     private List<Discipline> getDisciplinesWithoutAchievement(List<Discipline> requiredDisciplinesList) {
@@ -70,7 +63,7 @@ public class DisciplineServiceImpl implements DisciplineService {
         return null;
     }
 
-    private List<Registration> filterFailedDisciplines(List<Registration> registrationsList) {
+    private List<Registration> filterFailedDisciplines(List<Registration> registrationsList, List<MMatrix> disciplinesDependencyList) {
 
         return null;
     }
