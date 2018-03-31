@@ -1,8 +1,9 @@
 package br.org.roger.example.services;
 
 public class StudentTermServiceImpl implements StudentTermService {
+
     @Override
-    public Integer nextTerm(Object cod) {
+    public Integer nextTerm(Integer cod) {
 
         try {
             Thread.sleep(1000);
@@ -10,6 +11,6 @@ public class StudentTermServiceImpl implements StudentTermService {
             e.printStackTrace();
         }
 
-        return null;
+        return cod;
     }
 }

@@ -5,7 +5,7 @@ import br.org.roger.example.model.Matrix;
 public class MatrixServiceImpl implements MatrixService {
 
     @Override
-    public Matrix getMatrixById(Object matrixId) {
+    public Matrix getMatrixById(Integer matrixId) {
 
         try {
             Thread.sleep(1000);
@@ -13,7 +13,7 @@ public class MatrixServiceImpl implements MatrixService {
             e.printStackTrace();
         }
 
-        return new Matrix();
+        return new Matrix(23);
     }
 
 }

@@ -2,14 +2,18 @@ package br.org.roger.example.model;
 
 public class Matrix {
 
-    private Object id;
-    private Object cod;
+    private Integer id;
+    private Integer cod;
 
-    public Object getId() {
+    public Matrix(Integer id) {
+        this.id = id;
+    }
+
+    public Integer getId() {
         return id;
     }
 
-    public Object getCod() {
+    public Integer getCod() {
         return cod;
     }
 }

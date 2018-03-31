@@ -4,6 +4,6 @@ import br.org.roger.example.model.Matrix;
 
 public interface MatrixService {
 
-    Matrix getMatrixById(Object matrixId);
+    Matrix getMatrixById(Integer matrixId);
 
 }
