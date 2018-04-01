@@ -12,9 +12,9 @@ first version takes longer because it's sequential.
 
 |Hash|Feature|
 |---|---|
-|ceda595| First version with the blocking methods|
+|ceda595| First version with blocking methods.|
 |4e75059| Organizing the methods to have a better understanding of its dependencies.|
 |53ac7a2| Extracting methods to have a better understanding of its dependencies.|
 |a003f67| Using CompletableFuture to use its asynchronous feature.|
-|b82e0e8| Showing how CompletionStages can be chained together|
+|b82e0e8| Showing how CompletionStages can be chained|
 
