@@ -34,46 +34,18 @@ public class DisciplineServiceImpl implements DisciplineService {
 
     public List<Discipline> dependencyDisciplines() throws ExecutionException, InterruptedException {
 
-        long start = System.currentTimeMillis();
-
-        //Matrix matrix = getMatrix();
         final CompletionStage<Matrix> matrix = getMatrix();
 
-        //List<MMatrix> previousTermsDisciplines = getmMatrices(matrix);
-        final CompletionStage<List<MMatrix>> previousTermsDisciplines =
-            matrix
-            .thenComposeAsync(m -> getmMatrices(m));
-
-        //List<Registration> registrationsList = getRegistrations();
         final CompletionStage<List<Registration>> registrationsList = getRegistrations();
 
-        //List<MMatrix> disciplinesDependencyList = filterNonRegisteredDisciplines(previousTermsDisciplines, registrationsList);
-        final CompletionStage<List<MMatrix>> disciplinesDependencyList =
-            previousTermsDisciplines
+        final List<Discipline> disciplines =
+            getMatrix()
+            .thenComposeAsync(m -> getmMatrices(m))
             .thenCombineAsync(registrationsList, (p, r) -> new Pair<>(p, r))
-            .thenComposeAsync(pair -> filterNonRegisteredDisciplines(pair.left, pair.right));
-
-        //List<Registration> pendingRegistrationsList = filterFailedDisciplines(registrationsList, disciplinesDependencyList);
-        final CompletionStage<List<Registration>> pendingRegistrationsList =
-            registrationsList
-            .thenCombineAsync(disciplinesDependencyList, (r, d) -> filterFailedDisciplines(r, d));
-
-        //List<Discipline> requiredDisciplinesList = getRequiredDisciplines(matrix, pendingRegistrationsList);
-        final CompletionStage<List<Discipline>> requiredDisciplinesList =
-            matrix
-            .thenCombineAsync(pendingRegistrationsList, (m, r) -> getRequiredDisciplines(m, r));
-
-        long end = System.currentTimeMillis();
-
-        System.out.println("Time elapsed in depDisciplines() before get: " + (end - start) / 1000.0);
-
-        //return getDisciplinesWithoutAchievement(requiredDisciplinesList);
-        final List<Discipline> disciplines = requiredDisciplinesList
-                .thenApplyAsync(d -> getDisciplinesWithoutAchievement(d)).toCompletableFuture().get();
-
-        end = System.currentTimeMillis();
-
-        System.out.println("Time elapsed in depDisciplines(): " + (end - start) / 1000.0);
+            .thenComposeAsync(pair -> filterNonRegisteredDisciplines(pair.left, pair.right))
+            .thenCombineAsync(registrationsList, (d, r) -> filterFailedDisciplines(r, d))
+            .thenCombineAsync(matrix, (r, m) -> getRequiredDisciplines(m, r))
+            .thenApplyAsync(d -> getDisciplinesWithoutAchievement(d)).toCompletableFuture().get();
 
         return disciplines;
     }
